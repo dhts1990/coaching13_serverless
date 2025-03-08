@@ -14,9 +14,13 @@ resource "aws_lambda_function" "http_api_lambda" {
   role             = aws_iam_role.lambda_exec.arn
 
   environment {
-    variables = {} # todo: fill with apporpriate value
+    variables = {
+      DDB_TABLE = aws_dynamodb_table.table.name
+    } 
   }
 }
+
+
 
 resource "aws_iam_role" "lambda_exec" {
   name = "${local.name_prefix}-topmovies-api-executionrole"
@@ -45,7 +49,12 @@ resource "aws_iam_policy" "lambda_exec_role" {
         {
             "Effect": "Allow",
             "Action": [
-                "dynamodb:GetItem"
+                "dynamodb:GetItem",
+                "dynamodb:PutItem",
+                "dynamodb:UpdateItem",
+                "dynamodb:DeleteItem",
+                "dynamodb:Query",  
+                "dynamodb:Scan"    
             ],
             "Resource": "${aws_dynamodb_table.table.arn}"
         },
